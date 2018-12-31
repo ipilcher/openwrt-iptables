@@ -1,0 +1,79 @@
+#!/bin/sh /etc/rc.common
+
+# Copyright 2018 Ian Pilcher <arequipeno@gmail.com>
+#
+# This program is free software.  You can redistribute it or modify it under the
+# terms of version 2 of the GNU General Public License (GPL), as published by
+# the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY -- without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the text of the GPL for more details.
+#
+# Version 2 of the GNU General Public License is available at:
+#
+#   http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+#
+
+START=19
+
+EXTRA_COMMANDS='save dump'
+EXTRA_HELP=<<EOF
+        save    Persist current rules
+        dump    Write current rules to stdout
+EOF
+
+case $initscript in
+    /etc/*/*iptables)
+	CONFIG_FILE=/etc/config/iptables
+        XTABLES_CMD=/usr/sbin/iptables
+	TABLES='filter nat mangle'
+	;;
+    /etc/*/*ip6tables)
+	CONFIG_FILE=/etc/config/ip6tables
+	XTABLES_CMD=/usr/sbin/ip6tables
+	TABLES='filter mangle'
+	;;
+    *)
+	echo "Unknown service: $initscript" >&2
+	exit 1
+	;;
+esac
+
+all_chains_accept() {
+    local TABLE=$1
+    case $TABLE in
+	filter)
+	    local CHAINS='INPUT FORWARD OUTPUT'
+	    ;;
+	nat)
+	    local CHAINS='PREROUTING INPUT OUTPUT POSTROUTING'
+	    ;;
+	mangle)
+	    local CHAINS='PREROUTING INPUT FORWARD OUTPUT POSTROUTING'
+	    ;;
+    esac
+    for CHAIN in $CHAINS ; do
+	/usr/sbin/iptables -t $TABLE -P $CHAIN ACCEPT
+    done
+}
+
+start() {
+    ${XTABLES_CMD}-restore $CONFIG_FILE
+}
+
+stop() {
+    for TABLE in $TABLES ; do
+	all_chains_accept $TABLE
+	$XTABLES_CMD -t $TABLE -F
+	$XTABLES_CMD -t $TABLE -X
+    done
+}
+
+save() {
+    ${XTABLES_CMD}-save -f $CONFIG_FILE
+}
+
+dump() {
+    ${XTABLES_CMD}-save
+}
