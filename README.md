@@ -13,7 +13,10 @@ management tool.
 
 1. Symlink ``/etc/init.d/ip6tables`` to ``iptables``.
 
-1. Copy ``config/iptables`` and ``config/ip6tables`` to ``/etc/config/``.
+1. Create a directory &mdash; ``/etc/sysconfig``.
+
+1. Copy ``sysconfig/iptables`` and ``sysconfig/ip6tables`` to
+   ``/etc/sysconfig/``.
 
 1. Disable the default ``firewall`` service and enable the new services.
    1. ``service firewall disable``
@@ -32,7 +35,7 @@ management tool.
 
 The service script supports two additional commands:
 
-1. ``save`` &mdash; Saves current rules to ``/etc/config/iptables`` (or
-   ``/etc/config/ip6tables``).
+1. ``save`` &mdash; Saves current rules to ``/etc/sysconfig/iptables`` (or
+   ``/etc/sysconfig/ip6tables``).
    
 1. ``dump`` &mdash; Writes current rules to ``stdout``.

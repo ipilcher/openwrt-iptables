@@ -25,12 +25,12 @@ EOF
 
 case $initscript in
     /etc/*/*iptables)
-	CONFIG_FILE=/etc/config/iptables
+	CONFIG_FILE=/etc/sysconfig/iptables
         XTABLES_CMD=/usr/sbin/iptables
 	TABLES='filter nat mangle'
 	;;
     /etc/*/*ip6tables)
-	CONFIG_FILE=/etc/config/ip6tables
+	CONFIG_FILE=/etc/sysconfig/ip6tables
 	XTABLES_CMD=/usr/sbin/ip6tables
 	TABLES='filter mangle'
 	;;
